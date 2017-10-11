@@ -408,11 +408,9 @@ public class EddaImageJanitorCrawler implements JanitorCrawler {
             }
         }
     }
-
-    private void updateReferenceTimeByInstance(String region, List<Resource> batch, long since) {
-        LOGGER.info(String.format("Getting the last reference time by instance for batch of size %d", batch.size()));
-        String batchUrl = getInstanceBatchUrl(region, batch, since);
-        JsonNode batchResult = null;
+    
+    private void bathResult() {
+    	JsonNode batchResult = null;
         Map<String, Resource> idToResource = Maps.newHashMap();
         for (Resource resource : batch) {
             idToResource.put(resource.getId(), resource);
@@ -446,42 +444,17 @@ public class EddaImageJanitorCrawler implements JanitorCrawler {
         }
     }
 
+    private void updateReferenceTimeByInstance(String region, List<Resource> batch, long since) {
+        LOGGER.info(String.format("Getting the last reference time by instance for batch of size %d", batch.size()));
+        String batchUrl = getInstanceBatchUrl(region, batch, since);
+        bathResult();
+    }
+
     private void updateReferenceTimeByLaunchConfig(String region, List<Resource> batch, long since) {
         LOGGER.info(String.format("Getting the last reference time by launch config for batch of size %d",
                 batch.size()));
         String batchUrl = getLaunchConfigBatchUrl(region, batch, since);
-        JsonNode batchResult = null;
-        Map<String, Resource> idToResource = Maps.newHashMap();
-        for (Resource resource : batch) {
-            idToResource.put(resource.getId(), resource);
-        }
-        try {
-            batchResult = eddaClient.getJsonNodeFromUrl(batchUrl);
-        } catch (IOException e) {
-            LOGGER.error("Failed to get response for the batch.", e);
-        }
-        if (batchResult == null || !batchResult.isArray()) {
-            throw new RuntimeException(String.format("Failed to get valid document from %s, got: %s",
-                    batchUrl, batchResult));
-        }
-        for (Iterator<JsonNode> it = batchResult.getElements(); it.hasNext();) {
-            JsonNode elem = it.next();
-            JsonNode data = elem.get("data");
-            String imageId = data.get("imageId").getTextValue();
-            String launchConfigurationName = data.get("launchConfigurationName").getTextValue();
-            JsonNode ltimeNode = elem.get("ltime");
-            if (ltimeNode != null && !ltimeNode.isNull()) {
-                long ltime = ltimeNode.asLong();
-                Resource ami = idToResource.get(imageId);
-                String lastRefTimeByLC = ami.getAdditionalField(AMI_FIELD_LAST_LC_REF_TIME);
-                if (lastRefTimeByLC == null || Long.parseLong(lastRefTimeByLC) < ltime) {
-                    LOGGER.info(String.format(
-                            "The last time that the image %s was referenced by launch config %s is %d",
-                            imageId, launchConfigurationName, ltime));
-                    ami.setAdditionalField(AMI_FIELD_LAST_LC_REF_TIME, String.valueOf(ltime));
-                }
-            }
-        }
+        batchResult();
     }
 
     private String getInstanceBatchUrl(String region, List<Resource> batch, long since) {
