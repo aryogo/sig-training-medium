@@ -103,6 +103,44 @@ public class RDSJanitorResourceTracker implements JanitorResourceTracker {
 	}
 
 	/** {@inheritDoc} */
+	
+	public qualityCode() {
+		
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append(AWSResource.FIELD_RESOURCE_TYPE).append(",");
+		sb.append(AWSResource.FIELD_REGION).append(",");
+		sb.append(AWSResource.FIELD_OWNER_EMAIL).append(",");
+		sb.append(AWSResource.FIELD_DESCRIPTION).append(",");
+		sb.append(AWSResource.FIELD_STATE).append(",");
+		sb.append(AWSResource.FIELD_TERMINATION_REASON).append(",");
+		sb.append(AWSResource.FIELD_EXPECTED_TERMINATION_TIME).append(",");
+		sb.append(AWSResource.FIELD_ACTUAL_TERMINATION_TIME).append(",");
+		sb.append(AWSResource.FIELD_NOTIFICATION_TIME).append(",");
+		sb.append(AWSResource.FIELD_LAUNCH_TIME).append(",");
+		sb.append(AWSResource.FIELD_MARK_TIME).append(",");
+		sb.append(AWSResource.FIELD_OPT_OUT_OF_JANITOR).append(",");
+	}
+	
+	public qualityCode2() {
+		StringBuilder sb = new StringBuilder();
+		int updated = this.jdbcTemplate.update(sb.toString(),
+				 resource.getId(),
+				 value(resource.getResourceType().toString()),
+				 value(resource.getRegion()),
+				 emailValue(resource.getOwnerEmail()),
+				 value(resource.getDescription()),
+				 value(resource.getState().toString()),
+				 value(resource.getTerminationReason()),
+				 value(resource.getExpectedTerminationTime()),
+				 value(resource.getActualTerminationTime()),
+                value(resource.getNotificationTime()),
+				 value(resource.getLaunchTime()),
+				 value(resource.getMarkTime()),
+					 value(resource.isOptOutOfJanitor()),
+				 json);
+	}
+	
     @Override
     public void addOrUpdate(Resource resource) {
     	Resource orig = getResource(resource.getId(), resource.getRegion());
@@ -120,73 +158,22 @@ public class RDSJanitorResourceTracker implements JanitorResourceTracker {
     		sb.append("insert into ").append(table);
     		sb.append(" (");
     		sb.append(AWSResource.FIELD_RESOURCE_ID).append(",");
-    		sb.append(AWSResource.FIELD_RESOURCE_TYPE).append(",");
-    		sb.append(AWSResource.FIELD_REGION).append(",");
-    		sb.append(AWSResource.FIELD_OWNER_EMAIL).append(",");
-    		sb.append(AWSResource.FIELD_DESCRIPTION).append(",");
-    		sb.append(AWSResource.FIELD_STATE).append(",");
-    		sb.append(AWSResource.FIELD_TERMINATION_REASON).append(",");
-    		sb.append(AWSResource.FIELD_EXPECTED_TERMINATION_TIME).append(",");
-    		sb.append(AWSResource.FIELD_ACTUAL_TERMINATION_TIME).append(",");
-			sb.append(AWSResource.FIELD_NOTIFICATION_TIME).append(",");
-    		sb.append(AWSResource.FIELD_LAUNCH_TIME).append(",");
-    		sb.append(AWSResource.FIELD_MARK_TIME).append(",");
-			sb.append(AWSResource.FIELD_OPT_OUT_OF_JANITOR).append(",");
+    		qualityCode();
     		sb.append("additionalFields").append(") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-
+    		
             LOGGER.debug(String.format("Insert statement is '%s'", sb));
-    		int updated = this.jdbcTemplate.update(sb.toString(),
-    								 resource.getId(),
-    								 value(resource.getResourceType().toString()),
-    								 value(resource.getRegion()),
-    								 emailValue(resource.getOwnerEmail()),
-    								 value(resource.getDescription()),
-    								 value(resource.getState().toString()),
-    								 value(resource.getTerminationReason()),
-    								 value(resource.getExpectedTerminationTime()),
-    								 value(resource.getActualTerminationTime()),
-					                 value(resource.getNotificationTime()),
-    								 value(resource.getLaunchTime()),
-    								 value(resource.getMarkTime()),
-				  					 value(resource.isOptOutOfJanitor()),
-    								 json);
+    		qualityCode2();
             LOGGER.debug(String.format("%d rows inserted", updated));
     	} else {
     		StringBuilder sb = new StringBuilder();
     		sb.append("update ").append(table).append(" set ");
-    		sb.append(AWSResource.FIELD_RESOURCE_TYPE).append("=?,");
-    		sb.append(AWSResource.FIELD_REGION).append("=?,");
-    		sb.append(AWSResource.FIELD_OWNER_EMAIL).append("=?,");
-    		sb.append(AWSResource.FIELD_DESCRIPTION).append("=?,");
-    		sb.append(AWSResource.FIELD_STATE).append("=?,");
-    		sb.append(AWSResource.FIELD_TERMINATION_REASON).append("=?,");
-    		sb.append(AWSResource.FIELD_EXPECTED_TERMINATION_TIME).append("=?,");
-    		sb.append(AWSResource.FIELD_ACTUAL_TERMINATION_TIME).append("=?,");
-			sb.append(AWSResource.FIELD_NOTIFICATION_TIME).append("=?,");
-    		sb.append(AWSResource.FIELD_LAUNCH_TIME).append("=?,");
-    		sb.append(AWSResource.FIELD_MARK_TIME).append("=?,");
-			sb.append(AWSResource.FIELD_OPT_OUT_OF_JANITOR).append("=?,");
+    		qualityCode();
     		sb.append("additionalFields").append("=? where ");
     		sb.append(AWSResource.FIELD_RESOURCE_ID).append("=? and ");
 			sb.append(AWSResource.FIELD_REGION).append("=?");
 
             LOGGER.debug(String.format("Update statement is '%s'", sb));
-    		int updated = this.jdbcTemplate.update(sb.toString(),
-    								 resource.getResourceType().toString(),
-    								 value(resource.getRegion()),
-					                 emailValue(resource.getOwnerEmail()),
-    								 value(resource.getDescription()),
-    								 value(resource.getState().toString()),
-    								 value(resource.getTerminationReason()),
-    								 value(resource.getExpectedTerminationTime()),
-    								 value(resource.getActualTerminationTime()),
-					                 value(resource.getNotificationTime()),
-    								 value(resource.getLaunchTime()),
-    								 value(resource.getMarkTime()),
-					                 value(resource.isOptOutOfJanitor()),
-    								 json,
-    								 resource.getId(),
-						  			 resource.getRegion());
+    		qualityCode2();
             LOGGER.debug(String.format("%d rows updated", updated));
     	}
     	LOGGER.debug("Successfully saved.");
@@ -290,7 +277,23 @@ public class RDSJanitorResourceTracker implements JanitorResourceTracker {
 		}
 		return datetime;
 	}
-
+	
+	public resourceMap() {
+		 public Resource mapRow(ResultSet rs, int rowNum) throws SQLException {
+         	return mapResource(rs); 
+	}
+		 
+	public resource() {
+		Resource resource = null;
+        Validate.isTrue(resources.size() <= 1);
+        if (resources.size() == 0) {
+            LOGGER.info(String.format("Not found resource with id %s", resourceId));
+        } else {
+        	resource = resources.get(0);
+        }
+        return resource;
+	}
+	
     @Override
     public Resource getResource(String resourceId) {
         Validate.notEmpty(resourceId);
@@ -299,19 +302,11 @@ public class RDSJanitorResourceTracker implements JanitorResourceTracker {
 
         LOGGER.debug(String.format("Query is '%s'", query));
         List<Resource> resources = jdbcTemplate.query(query.toString(), new String[]{resourceId}, new RowMapper<Resource>() {
-            public Resource mapRow(ResultSet rs, int rowNum) throws SQLException {
-            	return mapResource(rs);                
-            }             
+                   resourceMap();                    
         });       
         
-        Resource resource = null;
-        Validate.isTrue(resources.size() <= 1);
-        if (resources.size() == 0) {
-            LOGGER.info(String.format("Not found resource with id %s", resourceId));
-        } else {
-        	resource = resources.get(0);
-        }
-        return resource;
+        resource();
+        
     }
 
 	@Override
@@ -323,19 +318,10 @@ public class RDSJanitorResourceTracker implements JanitorResourceTracker {
 
 		LOGGER.debug(String.format("Query is '%s'", query));
 		List<Resource> resources = jdbcTemplate.query(query.toString(), new String[]{resourceId,region}, new RowMapper<Resource>() {
-			public Resource mapRow(ResultSet rs, int rowNum) throws SQLException {
-				return mapResource(rs);
-			}
+			resourceMap();
 		});
 
-		Resource resource = null;
-		Validate.isTrue(resources.size() <= 1);
-		if (resources.size() == 0) {
-			LOGGER.info(String.format("Not found resource with id %s", resourceId));
-		} else {
-			resource = resources.get(0);
-		}
-		return resource;
+		 resource();
 	}
 
 	/**
