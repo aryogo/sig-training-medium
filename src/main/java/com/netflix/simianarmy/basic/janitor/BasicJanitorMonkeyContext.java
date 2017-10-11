@@ -170,7 +170,16 @@ public class BasicJanitorMonkeyContext extends BasicSimianArmyContext implements
         }
         return ruleEngine;
     }
-
+    
+    public ruleEngine() {
+    	JanitorRuleEngine ruleEngine = createJanitorRuleEngine();
+    	ruleEngine.addRule(new UntaggedRule(monkeyCalendar, getPropertySet("simianarmy.janitor.rule.untaggedRule.requiredTags"),
+                (int) configuration().getNumOrElse(
+                        "simianarmy.janitor.rule.untaggedRule.retentionDaysWithOwner", 3),
+                        (int) configuration().getNumOrElse(
+                                "simianarmy.janitor.rule.untaggedRule.retentionDaysWithoutOwner",
+                                8)));
+    }
     private ASGJanitor getASGJanitor() {
         JanitorRuleEngine ruleEngine = createJanitorRuleEngine();
         boolean discoveryEnabled = configuration().getBoolOrElse("simianarmy.janitor.Eureka.enabled", false);
@@ -205,12 +214,7 @@ public class BasicJanitorMonkeyContext extends BasicSimianArmyContext implements
         }
         if (configuration().getBoolOrElse("simianarmy.janitor.rule.untaggedRule.enabled", false)
             && getUntaggedRuleResourceSet().contains("ASG")) {
-            ruleEngine.addRule(new UntaggedRule(monkeyCalendar, getPropertySet("simianarmy.janitor.rule.untaggedRule.requiredTags"),
-                    (int) configuration().getNumOrElse(
-                            "simianarmy.janitor.rule.untaggedRule.retentionDaysWithOwner", 3),
-                            (int) configuration().getNumOrElse(
-                                    "simianarmy.janitor.rule.untaggedRule.retentionDaysWithoutOwner",
-                                    8)));
+            ruleEngine();
         }
 
         JanitorCrawler crawler;
@@ -280,12 +284,7 @@ public class BasicJanitorMonkeyContext extends BasicSimianArmyContext implements
         }
         if (configuration().getBoolOrElse("simianarmy.janitor.rule.untaggedRule.enabled", false)
             && getUntaggedRuleResourceSet().contains("EBS_VOLUME")) {
-            ruleEngine.addRule(new UntaggedRule(monkeyCalendar, getPropertySet("simianarmy.janitor.rule.untaggedRule.requiredTags"),
-                    (int) configuration().getNumOrElse(
-                            "simianarmy.janitor.rule.untaggedRule.retentionDaysWithOwner", 3),
-                            (int) configuration().getNumOrElse(
-                                    "simianarmy.janitor.rule.untaggedRule.retentionDaysWithoutOwner",
-                                    8)));
+        	ruleEngine();
         }
 
         JanitorCrawler volumeCrawler;
