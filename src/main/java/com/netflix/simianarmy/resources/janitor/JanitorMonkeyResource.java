@@ -86,6 +86,17 @@ public class JanitorMonkeyResource {
      * @return the response
      * @throws IOException
      */
+    public validate() {
+    	if (eventType.equals("OPTIN")) {
+            responseStatus = optInResource(resourceId, true, region, gen);
+        } else if (eventType.equals("OPTOUT")) {
+            responseStatus = optInResource(resourceId, false, region, gen);
+        } else {
+            responseStatus = Response.Status.BAD_REQUEST;
+            gen.writeStringField("message", String.format("Unrecognized event type: %s", eventType));
+        }
+    }
+    
     @GET @Path("addEvent")
     public Response addEventThroughHttpGet( @QueryParam("eventType") String eventType,  @QueryParam("resourceId") String resourceId,  @QueryParam("region") String region) throws IOException {
         Response.Status responseStatus;
@@ -100,15 +111,7 @@ public class JanitorMonkeyResource {
             gen.writeStartObject();
             gen.writeStringField("eventType", eventType);
             gen.writeStringField("resourceId", resourceId);
-
-        	if (eventType.equals("OPTIN")) {
-                responseStatus = optInResource(resourceId, true, region, gen);
-            } else if (eventType.equals("OPTOUT")) {
-                responseStatus = optInResource(resourceId, false, region, gen);
-            } else {
-                responseStatus = Response.Status.BAD_REQUEST;
-                gen.writeStringField("message", String.format("Unrecognized event type: %s", eventType));
-            }
+            validate();
             gen.writeEndObject();
             gen.close();
 
@@ -155,14 +158,7 @@ public class JanitorMonkeyResource {
             responseStatus = Response.Status.BAD_REQUEST;
             gen.writeStringField("message", "eventType and resourceId parameters are all required");
         } else {
-            if (eventType.equals("OPTIN")) {
-                responseStatus = optInResource(resourceId, true, region, gen);
-            } else if (eventType.equals("OPTOUT")) {
-                responseStatus = optInResource(resourceId, false, region, gen);
-            } else {
-                responseStatus = Response.Status.BAD_REQUEST;
-                gen.writeStringField("message", String.format("Unrecognized event type: %s", eventType));
-            }
+        	validate();
         }
         gen.writeEndObject();
         gen.close();
